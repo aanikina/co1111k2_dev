@@ -1,0 +1,122 @@
+body {
+
+    /*
+    body fills entire page with some padding - i expect no scrolling
+    */
+    padding: 30px;
+
+    font-family: "Courier New";
+    font-size: 20px;
+    color: darkgray;
+}
+
+.jackrabbit {
+    display: inline-block;
+}
+.stamp {
+    position: absolute;
+    transform: rotate(15deg);
+    top: 50px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+input {
+
+    font-size: 20px;
+    font-family: "Courier New";
+}
+
+.swatch {
+    width: 20px;
+    height: 20px;
+    display:inline-block;
+}
+
+.top {
+    position: relative;
+}
+
+.top h1 {
+    font-size: 35px;
+}
+
+.demopic {
+
+    /*
+    demo picture
+
+    help:
+    https://stackoverflow.com/questions/3680429/click-through-div-to-underlying-elements
+    */
+
+    position: absolute;
+    top: -15px;
+    left: 410px;
+    width: 150px;
+    transform: rotate(15deg);
+    pointer-events: none;
+
+}
+
+.t {
+
+    /*
+    text that represents some notable entities.
+    should attract attention.
+    */
+
+    background-color: darkgray;
+    color: white;
+    border-radius: 5px;
+    padding: 1px;
+
+}
+
+.right {
+    position: absolute;
+    left: 590px;
+    top: 10px;
+}
+
+canvas {
+    background-color: beige;
+}
+
+.editor .markings {
+
+    /*
+    settings for both markings
+    */
+
+    text-align: center;
+    position: absolute;
+    user-select: none;
+    width: 300px;
+    height: 30px;
+    pointer-events: none;
+}
+
+.editor .stretch_inner {
+
+    /*
+    this is a centered inner stretch that marks neck/tai connection width
+    */
+
+    width: 90px; /*i rely on this inner stretch being vertically centered and having fixed pixel width*/
+    display: inline-block;
+    border-left: 0.3em solid darkgray;
+    border-right: 0.3em solid darkgray;
+
+    font-size: 15px;
+
+}
+.editor .stretch_outer {
+
+
+    /*
+    this is for two outer stretches that are around the inner stretch
+    */
+    display: inline-block;
+
+}

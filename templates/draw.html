@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}"/>
+    <title>Draw</title>
+</head>
+<body onload="init();">
+
+<!--
+The code for canvas, palette and buttons is appropriated from a
+publicly available snippet and can be found here:
+https://stackoverflow.com/questions/2368784/draw-on-html5-canvas-using-a-mouse
+
+links 'url_for' help:
+https://www.freecodecamp.org/news/how-to-build-a-web-application-using-flask-and-deploy-it-to-the-cloud-3551c985e492/
+-->
+
+<!-- Editing area. -->
+
+<!-- for the canvas to work correctly many styles must be set here instead of css -->
+
+<div class="editor" style="border: 5px dashed darkgray; width: 520px;height: 300px;">
+    <span class="markings" style="transform: rotate(-90deg);left: -90px;top: 170px;">here will be the <span id="markL" class="t">head</span>
+        <br>
+        <span class="stretch_outer"></span>
+        <span class="stretch_inner"><span id="markL2">neck</span> width</span>
+        <span class="stretch_outer"></span>
+    </span>
+    <canvas id="can" width="400px" height="300px" style="margin-left:60px;"></canvas>
+    <span class="markings" style="transform: rotate(90deg);left: 395px;top: 170px;">here will be the <span id="markR" class="t">tail</span>
+    <br>
+    <span class="stretch_outer"></span>
+    <span class="stretch_inner"><span id="markR2">tail</span> width</span>
+    <span class="stretch_outer"></span>
+    </span>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/drawing.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/common.js') }}"></script>
+
+<!-- Info and controls. -->
+
+<div class="top">
+    <h1>You are drawing<br><span id="chosen_part" class="t">body</span></h1>
+
+    <input type="button" class="t" value="submit" id="btn" onclick="saveUi()" >
+    <input type="button" class="t" value="clear" id="clr" onclick="eraseUi()" >
+    <div class="swatch" style="background:black;" id="black" onclick="colorUi(this)"></div>
+    <div class="swatch" style="background:red;" id="red" onclick="colorUi(this)"></div>
+    <div class="swatch" style="background:orange;" id="orange" onclick="colorUi(this)"></div>
+    <div class="swatch" style="background:lightskyblue;" id="lightskyblue" onclick="colorUi(this)"></div>
+    <div class="swatch" style="background:greenyellow;" id="greenyellow" onclick="colorUi(this)"></div>
+    <div class="swatch" style="background:beige" id="eraser" onclick="colorUi(this)"></div>
+
+    <img src="{{ url_for('static', filename='img/demo.png') }}" class="demopic">
+
+</div>
+
+<div class="right">
+    <h3>Keyboard shortcuts</h3>
+
+    <span class="t">1</span> for black pen<br>
+    <span class="t">2</span> for red pen<br>
+    <span class="t">3</span> for orange pen<br>
+    <span class="t">4</span> for blue pen<br>
+    <span class="t">5</span> for green pen<br>
+    <span class="t">E</span> for eraser<br>
+    <span class="t">Enter</span> to submit<br>
+    <span class="t">Del</span> to clear<br>
+
+</div>
+
+<script>
+
+    // i send data as formData
+    // it doesn't understand arrays
+    // do i keep stats as an array of strings
+    // and later concatenate them into one big string
+    // for ease of use later i format those strings as yaml files separated by ---
+    var statsKeyboard = '';
+    var statsUi = '';
+
+    // autorun
+
+    // remember the user
+    setUniqueUserId();
+
+    // assign a body part 0,1,2
+    const BODYPART = Math.floor( Math.random()*3 );
+    console.log( BODYPART );
+    setCookie( 'bodypartiloc', BODYPART );
+
+    if( BODYPART==0 ) {
+        document.getElementById( 'chosen_part' ).innerText = 'head';
+        document.getElementById( 'markL' ).innerText = 'nothing';
+        document.getElementById( 'markR' ).innerText = 'body';
+        document.getElementById( 'markL2' ).innerText = 'nothing';
+        document.getElementById( 'markR2' ).innerText = 'neck';
+    }
+    else if( BODYPART==1 ) {
+        document.getElementById( 'chosen_part' ).innerText='body';
+    }
+    else if( BODYPART==2 ) {
+        document.getElementById( 'chosen_part' ).innerText = 'tail';
+        document.getElementById( 'markL' ).innerText = 'body';
+        document.getElementById( 'markR' ).innerText = 'nothing';
+        document.getElementById( 'markL2' ).innerText = 'tail';
+        document.getElementById( 'markR2' ).innerText = 'nothing';
+    }
+
+
+
+    document.addEventListener('keydown', (ev) => {
+
+        // help:
+        // https://stackoverflow.com/questions/17015019/keylistener-in-javascript
+
+        // get lowercase key pressed
+        let k = ev.key.toLowerCase();
+        //console.log( k );
+
+        // record keyboard shortcut being used
+        let yaml = `---\nkey: ${k}\ntimestamp: ${getCurrentTimestamp()}\n`;
+        statsKeyboard += yaml;
+
+        if( k=='1' ) { colorAlt('black'); }
+        else if( k=='2' ) { colorAlt('red'); }
+        else if( k=='3' ) { colorAlt('orange'); }
+        else if( k=='4' ) { colorAlt('lightskyblue'); }
+        else if( k=='5' ) { colorAlt('greenyellow'); }
+        else if( k=='e' ) { colorAlt('eraser'); }
+        else if( k=='delete' ) { erase(); }
+        else if( k=='enter' ) { save(); }
+
+    });
+
+</script>
+
+</body>
+</html>
