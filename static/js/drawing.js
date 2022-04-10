@@ -99,9 +99,11 @@ function save() {
     formData.append( 'user_agent', navigator.userAgent );
 
     // user id, chosen bodypart and final timestamp
-    formData.append( 'user_id', getCookie('user_id') );
+    let user_id = getCookie('user_id');
+    let tstamp = getCurrentTimestamp();
+    formData.append( 'user_id', user_id );
     formData.append( 'bodypartiloc', getCookie('bodypartiloc') );
-    formData.append( 'timestamp', getCurrentTimestamp() );
+    formData.append( 'timestamp', tstamp );
 
     // usage stats
     formData.append( 'stats_keyboard', statsKeyboard );
@@ -115,10 +117,11 @@ function save() {
     request.open( 'POST', `/upload`, true );
     request.send( formData );
 
-    // show result
+    // show result with the submitted image
     // help:
     // https://stackoverflow.com/questions/1226714/how-to-get-the-browser-to-navigate-to-url-in-javascript
-    //window.location.href = '/result';
+    let filename = `${user_id}___${tstamp}.png`;
+    window.location.href = `/result/${filename}`;
 
 }
 function saveUi() {

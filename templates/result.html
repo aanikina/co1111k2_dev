@@ -17,13 +17,14 @@ https://www.freecodecamp.org/news/how-to-build-a-web-application-using-flask-and
 <!-- Info and controls. -->
 
 <div class="top">
-    <h1>Breathtaking masterpiece<br></h1>
-
-    {% for image_src in image_srcs %}
-    <img class="jackrabbit" src="{{image_src}}" alt={{image_src}}></img>
-    {% endfor %}
-
+    <h1>Breathtaking masterpiece</h1>
     <span class="stamp">{{ stamp }}</span>
+
+    <div style="overflow: hidden; white-space: nowrap; font-size: 0px;border-left: 5px dashed darkgray;border-right: 5px dashed darkgray;width: min-content;">
+        {% for image_src in image_srcs %}
+        <img class="jackrabbit" src="{{ image_src }}" alt="{{ image_src }}"></img>
+        {% endfor %}
+    </div>
 
 </div>
 

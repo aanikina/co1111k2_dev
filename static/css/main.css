@@ -11,12 +11,24 @@ body {
 }
 
 .jackrabbit {
+
+    /*
+    help:
+    https://stackoverflow.com/questions/1703183/how-to-not-wrap-contents-of-a-div
+    */
+
     display: inline-block;
+    float: none;
+    width: 150px;
+    clear: both;
+    border: 1px solid darkgray;
+    background-color: beige;
 }
 .stamp {
     position: absolute;
     transform: rotate(15deg);
-    top: 50px;
+    top: 10px;
+    left: 500px;
     font-weight: bold;
     letter-spacing: 2px;
 }

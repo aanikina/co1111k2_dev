@@ -14,11 +14,13 @@ from random import randint
 #import json
 import os
 # pip install
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from yaml import dump
 # same project
+from ghub import upload_images_to_github, upload_stats_to_github
 
-PATH_FOR_IMAGES = r'C:\n4\znv\CO1111\k2'
+PATH_FOR_IMAGES =  './static/bodyparts' #r'C:\n4\znv\CO1111\k2'
+PATH_FOR_DATA = './s'
 
 def savef( path, text ):
     with open( path, 'w', encoding='utf-8' ) as f:
@@ -33,19 +35,24 @@ def savef_yaml( path, data ):
 def get_bodypart( bodypart, f=None ):
     
     root = None
+    subfolder = None
     if bodypart=='head':
-        root = os.path.join( PATH_FOR_IMAGES,'0' )
+        #root = os.path.join( PATH_FOR_IMAGES,'0' )
+        subfolder = '0'
     elif bodypart=='body':
-        root = os.path.join( PATH_FOR_IMAGES,'1' )
+        #root = os.path.join( PATH_FOR_IMAGES,'1' )
+        subfolder = '1'
     if bodypart=='tail':
-        root = os.path.join( PATH_FOR_IMAGES,'2' )
+        #root = os.path.join( PATH_FOR_IMAGES,'2' )
+        subfolder = '2'
+    root = '/'.join( [PATH_FOR_IMAGES,subfolder] )
     
     # i know exact filename
     if not f is None:
         src = os.path.join( root,f )
         if os.path.isfile(src):
             # it actually exists
-            return src
+            return url_for( 'static',filename='bodyparts/%s/%s'%(subfolder,f) )
     
     # ill choose random
     fs = os.listdir( root )
@@ -55,8 +62,7 @@ def get_bodypart( bodypart, f=None ):
     
     # i have something to choose from
     iloc = randint( 0, len(fs)-1 )
-    src = os.path.join( root,fs[iloc] )
-    return src
+    return url_for( 'static',filename='bodyparts/%s/%s'%(subfolder,fs[iloc]) )
 
 def determine_animal_structure( bodyparts ):
     
@@ -162,8 +168,7 @@ def upload():
         # save stats
         
         src1 = os.path.join(
-            PATH_FOR_IMAGES,
-            's',
+            PATH_FOR_DATA,
             '%s___%s%s.yaml'%(
                 request.form['user_id'],
                 request.form['timestamp'],
@@ -174,8 +179,7 @@ def upload():
         #print(src1)
         
         src2 = os.path.join(
-            PATH_FOR_IMAGES,
-            's',
+            PATH_FOR_DATA,
             '%s___%s%s.yaml'%(
                 request.form['user_id'],
                 request.form['timestamp'],
@@ -187,8 +191,7 @@ def upload():
         
         # save metadata
         src = os.path.join(
-            PATH_FOR_IMAGES,
-            's',
+            PATH_FOR_DATA,
             '%s___%s.yaml'%(
                 request.form['user_id'],
                 request.form['timestamp'],
@@ -205,6 +208,12 @@ def upload():
         savef_yaml( src, data )
         #print(src)
         
+        # upload just saved files to private github storage
+        # these files will not be accessibl ein the app
+        # and will not be automatically deleted by heroku
+        #upload_stats_to_github( [src1,src2,src] )
+        #upload_images_to_github( [src0] )
+        
         # show result with current bodypart
         # help:
         # https://www.askpython.com/python-modules/flask/flask-redirect-url
@@ -219,5 +228,5 @@ if __name__ == '__main__':
     app.run( debug=True )
 
 #---------------------------------------------------------------------------+++
-# end 2022.04.09
-# created
+# end 2022.04.10
+# added github file uploading
