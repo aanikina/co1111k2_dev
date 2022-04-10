@@ -21,7 +21,7 @@ body {
     float: none;
     width: 150px;
     clear: both;
-    border: 1px solid darkgray;
+    /*border: 1px solid darkgray;*/
     background-color: beige;
 }
 .stamp {

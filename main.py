@@ -8,61 +8,43 @@ import logging
 log = logging.getLogger(__name__)
 
 # embedded in python
-from base64 import b64decode
 from random import randint
-#import datetime as dt
-#import json
-import os
 # pip install
-from flask import Flask, render_template, request, redirect, url_for
-from yaml import dump
+from flask import Flask, render_template, request, redirect
 # same project
-from ghub import upload_images_to_github, upload_stats_to_github
+from ghub import ( write_file_to_github, load_file_from_github,
+    list_files_in_github )
 
-PATH_FOR_IMAGES =  './static/bodyparts' #r'C:\n4\znv\CO1111\k2'
-PATH_FOR_DATA = './s'
+#-------------------+++
+# Definitions.
 
-def savef( path, text ):
-    with open( path, 'w', encoding='utf-8' ) as f:
-        f.write(text)
-    log.info( 'saved file %s'%path )
-    
-def savef_yaml( path, data ):
-    with open( path, 'w', encoding='utf-8' ) as f:
-        dump( data, f )
-    log.info( 'saved file %s'%path )
-    
 def get_bodypart( bodypart, f=None ):
     
-    root = None
     subfolder = None
-    if bodypart=='head':
-        #root = os.path.join( PATH_FOR_IMAGES,'0' )
-        subfolder = '0'
-    elif bodypart=='body':
-        #root = os.path.join( PATH_FOR_IMAGES,'1' )
-        subfolder = '1'
-    if bodypart=='tail':
-        #root = os.path.join( PATH_FOR_IMAGES,'2' )
-        subfolder = '2'
-    root = '/'.join( [PATH_FOR_IMAGES,subfolder] )
+    if bodypart=='head': subfolder = '0'
+    elif bodypart=='body': subfolder = '1'
+    elif bodypart=='tail': subfolder = '2'
+    
+    srcs = list_files_in_github( subfolder )
     
     # i know exact filename
     if not f is None:
-        src = os.path.join( root,f )
-        if os.path.isfile(src):
-            # it actually exists
-            return url_for( 'static',filename='bodyparts/%s/%s'%(subfolder,f) )
+        
+        for src in srcs:
+            if f in src:
+                # it actually exists
+                data = load_file_from_github( src )
+                return data
     
     # ill choose random
-    fs = os.listdir( root )
     
     # ive got nothing to choose from
-    if len(fs)==0: return ''
+    if len(srcs)==0: return ''
     
     # i have something to choose from
-    iloc = randint( 0, len(fs)-1 )
-    return url_for( 'static',filename='bodyparts/%s/%s'%(subfolder,fs[iloc]) )
+    iloc = randint( 0, len(srcs)-1 )
+    data = load_file_from_github( srcs[iloc] )
+    return data
 
 def determine_animal_structure( bodyparts ):
     
@@ -78,7 +60,10 @@ def determine_animal_structure( bodyparts ):
     text = ''
     ilocs = ()
     
-    if nohead&nobody:
+    if nohead&nobody&notail:
+        text = 'a ghost'
+        ilocs = () # nothing
+    elif nohead&nobody:
         text = '?!'
         ilocs = (2,2) # two mirrored tails
     elif nohead&notail:
@@ -92,15 +77,8 @@ def determine_animal_structure( bodyparts ):
         ilocs = (0,1,2) # three parts
     return text, ilocs
 
-def save_base64_image( path, data ):
-    
-    # help:
-    # https://stackoverflow.com/questions/34116682/save-base64-image-python
-    # https://stackoverflow.com/questions/45879045/binascii-error-incorrect-padding-even-when-string-length-is-multiple-of-4
-    
-    im = b64decode( data.partition(',')[2] )
-    with open( path, 'wb' ) as f:
-        f.write(im)
+#-------------------+++
+# Actual code.
 
 # help:
 # https://www.freecodecamp.org/news/how-to-build-a-web-application-using-flask-and-deploy-it-to-the-cloud-3551c985e492/
@@ -125,6 +103,9 @@ def result( f=None ):
         get_bodypart( 'body',f=f ),
         get_bodypart( 'tail',f=f )
         ]
+    
+    for bp in bodyparts:
+        print( len(bp) )
     
     # adapt for missing parts
     text, ilocs = determine_animal_structure( bodyparts )
@@ -157,45 +138,32 @@ def upload():
             request.form['user_id'],
             request.form['timestamp']
             )
-        src0 = os.path.join(
-            PATH_FOR_IMAGES,
-            str(bodypartiloc),
+        src0 = '%s/%s'%(
+            bodypartiloc,
             f
             )
-        save_base64_image( src0, request.form['image64'] )
-        #print(src0)
+        write_file_to_github( src0, request.form['image64'] )
         
         # save stats
         
-        src1 = os.path.join(
-            PATH_FOR_DATA,
-            '%s___%s%s.yaml'%(
-                request.form['user_id'],
-                request.form['timestamp'],
-                'kb'
-                )
+        src1 = 's/%s___%s%s.yaml'%(
+            request.form['user_id'],
+            request.form['timestamp'],
+            'kb'
             )
-        savef( src1, request.form['stats_keyboard'] )
-        #print(src1)
+        write_file_to_github( src1, request.form['stats_keyboard'] )
         
-        src2 = os.path.join(
-            PATH_FOR_DATA,
-            '%s___%s%s.yaml'%(
-                request.form['user_id'],
-                request.form['timestamp'],
-                'ui'
-                )
+        src2 = 's/%s___%s%s.yaml'%(
+            request.form['user_id'],
+            request.form['timestamp'],
+            'ui'
             )
-        savef( src2, request.form['stats_ui'] )
-        #print(src2)
+        write_file_to_github( src2, request.form['stats_ui'] )
         
         # save metadata
-        src = os.path.join(
-            PATH_FOR_DATA,
-            '%s___%s.yaml'%(
-                request.form['user_id'],
-                request.form['timestamp'],
-                )
+        src = 's/%s___%s.yaml'%(
+            request.form['user_id'],
+            request.form['timestamp'],
             )
         data = {
             'user id': request.form['user_id'],
@@ -205,14 +173,7 @@ def upload():
             'ui stats': src2,
             'im': src0,
             }
-        savef_yaml( src, data )
-        #print(src)
-        
-        # upload just saved files to private github storage
-        # these files will not be accessibl ein the app
-        # and will not be automatically deleted by heroku
-        #upload_stats_to_github( [src1,src2,src] )
-        #upload_images_to_github( [src0] )
+        write_file_to_github( src, str(data) )
         
         # show result with current bodypart
         # help:

@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 from base64 import b64encode
 import os
 # pip install
-from github import Github
+from github import Github, UnknownObjectException
 from github import InputGitTreeElement
 # same project
 
@@ -52,6 +52,54 @@ def login_into_repo( repo_name ):
     repo = g.get_user().get_repo( repo_name )
     
     return repo
+
+def list_files_in_github( root ):
+    
+    # help:
+    # https://pygithub.readthedocs.io/en/latest/examples/Repository.html
+    
+    repo = login_into_repo( 'co1111k2_storage' )
+    
+    try:
+        
+        contents = repo.get_contents( root )
+        paths = []
+        for content_file in contents:
+            paths.append( content_file.path )
+            
+        return paths
+    
+    except UnknownObjectException:
+        # such root folder doesnt exist yet
+        return []
+    
+def load_file_from_github( src ):
+    
+    # Read file from persistent
+    # storage --- private repository.
+    
+    # help:
+    # https://medium.com/geekculture/files-on-heroku-cd09509ed285
+    
+    repo = login_into_repo( 'co1111k2_storage' )
+
+    data = repo.get_contents(src)
+    
+    return data.decoded_content.decode()
+    
+def write_file_to_github( dest, data ):
+    
+    # Save file to persistent
+    # storage --- private repository.
+    
+    # help:
+    # https://medium.com/geekculture/files-on-heroku-cd09509ed285
+    
+    repo = login_into_repo( 'co1111k2_storage' )
+        
+    commit_message = 'automatic send'
+    
+    repo.create_file( dest, commit_message, data, branch="master" )
     
 def upload_stats_to_github( srcs ):
     
