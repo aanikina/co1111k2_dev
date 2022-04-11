@@ -41,16 +41,19 @@ function init() {
     document.body.addEventListener("touchstart", function (e) {
         if (e.target == canvas) {
             e.preventDefault();
+            findxy('up', e);
         }
     }, false);
     document.body.addEventListener("touchend", function (e) {
         if (e.target == canvas) {
             e.preventDefault();
+            findxy('down', e);
         }
     }, false);
     document.body.addEventListener("touchmove", function (e) {
         if (e.target == canvas) {
             e.preventDefault();
+            findxy('move', e);
         }
     }, false);
 
