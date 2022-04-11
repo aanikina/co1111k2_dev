@@ -33,6 +33,27 @@ function init() {
     canvas.addEventListener("mouseout", function (e) {
         findxy('out', e)
     }, false);
+
+    // The code for the following event listeners that
+    // prevent scrolling when touching the canvas
+    // is appropriated from publicly available snippet which can be found here:
+    // https://bencentra.com/code/2014/12/05/html5-canvas-touch-events.html
+    document.body.addEventListener("touchstart", function (e) {
+        if (e.target == canvas) {
+            e.preventDefault();
+        }
+    }, false);
+    document.body.addEventListener("touchend", function (e) {
+        if (e.target == canvas) {
+            e.preventDefault();
+        }
+    }, false);
+    document.body.addEventListener("touchmove", function (e) {
+        if (e.target == canvas) {
+            e.preventDefault();
+        }
+    }, false);
+
 }
 
 function colorUi(obj) {
