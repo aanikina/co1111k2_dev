@@ -39,21 +39,21 @@ function init() {
     // is appropriated from publicly available snippet which can be found here:
     // https://bencentra.com/code/2014/12/05/html5-canvas-touch-events.html
     document.body.addEventListener("touchstart", function (e) {
+        findxy('up', e);
         if (e.target == canvas) {
             e.preventDefault();
-            findxy('up', e);
         }
     }, false);
     document.body.addEventListener("touchend", function (e) {
+        findxy('down', e);
         if (e.target == canvas) {
             e.preventDefault();
-            findxy('down', e);
         }
     }, false);
     document.body.addEventListener("touchmove", function (e) {
+        findxy('move', e);
         if (e.target == canvas) {
             e.preventDefault();
-            findxy('move', e);
         }
     }, false);
 
