@@ -87,7 +87,7 @@ app = Flask(__name__)
 
 @app.route( '/' )
 def home():
-    return "AAAAAAAAAAAAA"
+    return render_template("rules.html")
 
 @app.route("/draw")
 def draw():
