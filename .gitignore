@@ -1,0 +1,9 @@
+# ignore all, unignore all with extensions, unignore all dirs
+*
+!*.*
+!*/
+# ignore specific
+**/__pycache__
+/.spyproject
+/.idea
+token
