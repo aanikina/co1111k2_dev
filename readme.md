@@ -1,6 +1,6 @@
 ## About
 
-This repository contains source code of the web application made as part of the "CO1111 Computing Challenge" course. Live version can be seen [here](https://co1111k2.herokuapp.com).
+This repository contains source code of the web application made as part of the "CO1111 Computing Challenge" course.
 
 ## How to use
 
